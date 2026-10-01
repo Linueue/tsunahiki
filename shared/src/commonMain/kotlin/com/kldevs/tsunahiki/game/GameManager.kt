@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,45 +73,55 @@ import com.kldevs.tsunahiki.audio.AudioEngine
 import com.kldevs.tsunahiki.game.character.ICharacterCatalog
 import com.kldevs.tsunahiki.game.character.KanaCatalog
 import com.kldevs.tsunahiki.game.utils.CanvasStroke
+import com.kldevs.tsunahiki.game.utils.SpringButton
 import com.kldevs.tsunahiki.game.utils.SpringText
 import com.kldevs.tsunahiki.game.utils.normalizeOffset
 import com.kldevs.tsunahiki.game.utils.similarity
 import com.kldevs.tsunahiki.game.utils.unnormalizeOffset
+import com.kldevs.tsunahiki.menu.DialogMenu
+import com.kldevs.tsunahiki.menu.DialogOption
+import com.kldevs.tsunahiki.menu.LoadingView
+import com.kldevs.tsunahiki.menu.MatchRewardsMenu
+import com.kldevs.tsunahiki.menu.PauseMenu
+import com.kldevs.tsunahiki.menu.TextCoins
+import com.kldevs.tsunahiki.menu.TextDisplay
+import com.kldevs.tsunahiki.navigation.GameplayRoute
+import com.kldevs.tsunahiki.navigation.NavFn
+import com.kldevs.tsunahiki.navigation.NavToFn
 import com.kldevs.tsunahiki.ui.theme.AppTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import tsunahiki.shared.generated.resources.Res
+import tsunahiki.shared.generated.resources.hint
 import tsunahiki.shared.generated.resources.pause
 import tsunahiki.shared.generated.resources.sound
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun CircleButton(onClick: () -> Unit, content: @Composable() RowScope.() -> Unit) {
-    Button(
+    SpringButton(
         onClick = onClick,
         modifier = Modifier
             .size(50.dp),
-        shape = CircleShape,
-        contentPadding = PaddingValues(0.dp),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.surfaceVariant),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
         content = content,
     )
 }
 
 @Composable
-fun MainTop(gameState: GameState) {
+fun MainTop(gameState: GameState, onEvent: OnEventFn) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         CircleButton(
-            onClick = {},
+            onClick = {
+                onEvent(GameEvent.Pause(true))
+            },
         ) {
             Image(painter = painterResource(Res.drawable.pause), contentDescription = "Pause")
         }
@@ -118,7 +129,9 @@ fun MainTop(gameState: GameState) {
             modifier = Modifier.width(125.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text("Guided - Kata", fontFamily = MaterialTheme.typography.displayMedium.fontFamily, fontWeight = FontWeight.W600)
+            val guidedText = if(gameState.isGuided) "Guided - Kana" else "Unguided - Kana"
+
+            Text(guidedText, fontFamily = MaterialTheme.typography.displayMedium.fontFamily, fontWeight = FontWeight.W600)
         }
         Box(
             modifier = Modifier
@@ -140,7 +153,7 @@ fun MainTop(gameState: GameState) {
 }
 
 @Composable
-fun MainPlayer(gameState: GameState, playerName: String)
+fun MainPlayer(player: PlayerDisplay)
 {
     Column(
         modifier = Modifier.width(60.dp),
@@ -152,10 +165,14 @@ fun MainPlayer(gameState: GameState, playerName: String)
                 .background(MaterialTheme.colorScheme.primary),
             contentAlignment = Alignment.Center,
         ) {
-            Text("\uD83E\uDD8A")
+            Image(
+                painter = painterResource(GameAvatars.getDrawable(player.avatar)),
+                contentDescription = "Avatar",
+                contentScale = ContentScale.FillBounds,
+            )
         }
         Text(
-            playerName,
+            player.name,
             color = MaterialTheme.colorScheme.onSurface,
             fontSize = 12.sp,
             fontWeight = FontWeight.W600,
@@ -225,7 +242,7 @@ fun MainRope(gameState: GameState) {
 }
 
 @Composable
-fun MainMiddle(gameState: GameState) {
+fun MainMiddle(gameState: GameState, onEvent: OnEventFn) {
     val displayCharacter = gameState.characterDesc!!.getDisplay()
 
     Column(
@@ -245,9 +262,9 @@ fun MainMiddle(gameState: GameState) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                MainPlayer(gameState, "Aki (You)")
+                MainPlayer(gameState.playerDisplay)
                 MainRope(gameState)
-                MainPlayer(gameState, "Enemy")
+                MainPlayer(gameState.enemyDisplay)
             }
         }
         Box(
@@ -260,10 +277,15 @@ fun MainMiddle(gameState: GameState) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 CircleButton(
-                    onClick = {}) {
+                    onClick = {
+                        onEvent(GameEvent.RequestHearSound)
+                    }
+                ) {
                     Image(
                         painter = painterResource(Res.drawable.sound),
-                        contentDescription = "Sound"
+                        contentDescription = "Sound",
+                        modifier = Modifier
+                            .size(18.dp),
                     )
                 }
 
@@ -283,11 +305,15 @@ fun MainMiddle(gameState: GameState) {
                 }
 
                 CircleButton(
-                    onClick = {}
+                    onClick = {
+                        onEvent(GameEvent.RequestGuide(false))
+                    }
                 ) {
                     Image(
-                        painter = painterResource(Res.drawable.sound),
-                        contentDescription = "Sound"
+                        painter = painterResource(Res.drawable.hint),
+                        contentDescription = "Hint",
+                        modifier = Modifier
+                            .size(18.dp),
                     )
                 }
             }
@@ -319,23 +345,24 @@ fun MainCanvas(gameState: GameState, modifier: Modifier, onEvent: OnEventFn) {
         List(guideStrokesSize) { Animatable(0.0f) }
     }
 
-    LaunchedEffect(guideStrokes) {
+    LaunchedEffect(guideStrokes, gameState.requestGuide) {
+        if(!gameState.requestGuide || guideStrokes.isEmpty())
+            return@LaunchedEffect
+
         val duration = 1000
         val pauseDuration = 200
-        while(true) {
-            guideStrokeAnims.forEach { it.snapTo(0.0f) }
-            guideStrokeAnims.forEachIndexed { index, anim ->
-                launch {
-                    val delayMs = duration * index + pauseDuration
-                    anim.animateTo(
-                        1.0f,
-                        animationSpec = tween(duration, delayMs, FastOutSlowInEasing)
-                    )
-                }
+        guideStrokeAnims.forEach { it.snapTo(0.0f) }
+        guideStrokeAnims.forEachIndexed { index, anim ->
+            launch {
+                val delayMs = duration * index + pauseDuration
+                anim.animateTo(
+                    1.0f,
+                    animationSpec = tween(duration, delayMs, FastOutSlowInEasing)
+                )
             }
-            delay(((duration + pauseDuration) * guideStrokeAnims.size).milliseconds)
-            delay(1000L.milliseconds)
         }
+        delay(((duration + pauseDuration) * guideStrokeAnims.size).milliseconds)
+        onEvent(GameEvent.GuideFinished)
     }
 
     Canvas(
@@ -556,29 +583,111 @@ fun MainBottom(gameState: GameState, onEvent: OnEventFn) {
 }
 
 @Composable
-fun MainGame() {
-    var catalog by remember { mutableStateOf<ICharacterCatalog?>(null) }
+private fun StartingView(gameState: GameState) {
+    DialogMenu(
+        "Starting...",
+        isVisible = gameState.phase == GamePhase.Starting,
+        options = listOf(),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            TextDisplay(
+                "Starting in ${gameState.startingCount}",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.W500,
+            )
+        }
+    }
+}
 
-    LaunchedEffect(Unit) {
-        catalog = KanaCatalog.load()
+@Composable
+private fun NotEnoughCoinsView(gameState: GameState, onDismiss: () -> Unit) {
+    DialogMenu(
+        title = "Not Enough Coins!",
+        isVisible = gameState.phase == GamePhase.GuideNotEnoughMoney,
+        options = listOf(
+            DialogOption("Okay", onDismiss, false),
+        ),
+    ) {}
+}
+
+@Composable
+private fun ConfirmedView(gameState: GameState, onDismiss: () -> Unit) {
+    DialogMenu(
+        title = "Successfully Purchased",
+        isVisible = gameState.phase == GamePhase.GuideConfirm,
+        options = listOf(
+            DialogOption("Okay", onDismiss, false),
+        ),
+    ) {}
+}
+
+@Composable
+private fun GuidedView(gameState: GameState, onEvent: OnEventFn) {
+    val guidedCost = 100
+
+    DialogMenu(
+        "This is Unguided!",
+        isVisible = gameState.phase == GamePhase.GuideDialog,
+        options = listOf(
+            DialogOption("No", {
+                onEvent(GameEvent.DismissGuideDialog)
+            }, true),
+            DialogOption("Buy", {
+                onEvent(GameEvent.GuideConfirm)
+            }, false),
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+        ) {
+            TextDisplay(
+                "Using a guide in unguided will cost you",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.W500,
+            )
+            TextCoins(guidedCost.toString())
+        }
     }
 
-    if(catalog == null)
-        return
+    ConfirmedView(gameState, {
+        onEvent(GameEvent.RequestGuide(true))
+    })
+    NotEnoughCoinsView(gameState, {
+        onEvent(GameEvent.DismissGuideDialog)
+    })
+}
 
+@Composable
+fun MainGame(isGuided: Boolean, onBack: NavFn, navTo: NavToFn) {
     val scope = rememberCoroutineScope()
     val audioEngine = koinInject<AudioEngine>()
-    val gameLogic = remember(catalog) {
-        GameLogic(catalog!!, scope, audioEngine)
+    val settings = koinInject<GameSettings>()
+    val playerRepo = koinInject<PlayerRepository>()
+    val playerState = remember { PlayerState().apply { applySave(playerRepo.load()) } }
+    val catalog = KanaCatalog.getOrNull()
+    val gameLogic = remember {
+        GameLogic(playerRepo, settings, playerState, catalog!!, scope, audioEngine)
     }
     val gameState by gameLogic.state.collectAsState()
 
     LaunchedEffect(gameLogic) {
-        gameLogic.start()
+        gameLogic.start(isGuided)
     }
 
-    if(gameState.characterDesc == null)
-        return
+    LaunchedEffect(gameState.phase) {
+        if(gameState.phase != GamePhase.GameOver)
+            return@LaunchedEffect
+
+        gameLogic.onEvent(GameEvent.GameOverSound)
+    }
 
     Box(
         modifier = Modifier
@@ -590,22 +699,36 @@ fun MainGame() {
             verticalArrangement = Arrangement.Top,
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
-                MainTop(gameState)
+                MainTop(gameState, gameLogic::onEvent)
             }
             Box(modifier = Modifier.weight(1f).fillMaxSize()) {
-                MainMiddle(gameState)
+                MainMiddle(gameState, gameLogic::onEvent)
             }
             Box(modifier = Modifier.weight(1f).fillMaxSize()) {
                 MainBottom(gameState, gameLogic::onEvent)
             }
         }
     }
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(gameState.cost.toString())
+    PauseMenu(gameState, gameLogic::onEvent)
+    StartingView(gameState)
+    GuidedView(gameState, gameLogic::onEvent)
+
+    if(gameState.phase == GamePhase.GameOver) {
+        val isGameOver = gameState.phase == GamePhase.GameOver
+        val isWin = gameState.gameOverState == GameOverState.Win
+        val rewards = calculateRewards(catalog!!.getLanguage(), isWin, gameState.score, playerState)
+
+        MatchRewardsMenu(
+            gameState,
+            rewards,
+            onRematch = {
+                onBack()
+                navTo(GameplayRoute(isGuided))
+            },
+            onSettings = {
+                onBack()
+            },
+        )
     }
 }
 
@@ -613,6 +736,5 @@ fun MainGame() {
 @Composable
 fun PreviewGame() {
     AppTheme {
-        MainGame()
     }
 }

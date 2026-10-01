@@ -33,6 +33,11 @@ actual class AudioEngine(private val context: Context) {
     private var musicPlayer: ExoPlayer? = null
     private var musicWasPlaying = false
 
+    private var currentMusicPlaying = ""
+
+    private var sfxVolume = 1.0f
+    private var musicVolume = 1.0f
+
     private val lifecycleObserver = object : DefaultLifecycleObserver {
         override fun onStop(owner: LifecycleOwner) {
             // app went to background
@@ -65,8 +70,8 @@ actual class AudioEngine(private val context: Context) {
         val id = sfxIds[sfx] ?: return
         soundPool.play(
             id,
-            1f,   // left volume
-            1f,   // right volume
+            sfxVolume,   // left volume
+            sfxVolume,   // right volume
             1,    // priority
             0,    // loop
             1f    // rate
@@ -74,7 +79,11 @@ actual class AudioEngine(private val context: Context) {
     }
 
     actual fun playMusic(assetPath: String, loop: Boolean) {
+        if(currentMusicPlaying == assetPath)
+            return
+
         stopMusic()
+        currentMusicPlaying = assetPath
 
         musicPlayer = ExoPlayer.Builder(context)
             .setAudioAttributes(
@@ -91,10 +100,12 @@ actual class AudioEngine(private val context: Context) {
                 repeatMode = if (loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
                 prepare()
                 playWhenReady = true
+                volume = musicVolume
             }
     }
 
     actual fun stopMusic() {
+        currentMusicPlaying = ""
         musicPlayer?.run {
             stop()
             release()
@@ -106,5 +117,14 @@ actual class AudioEngine(private val context: Context) {
         stopMusic()
         soundPool.release()
         sfxIds.clear()
+    }
+
+    actual fun setSfxVolume(volume: Float) {
+        sfxVolume = volume
+    }
+
+    actual fun setMusicVolume(volume: Float) {
+        musicVolume = volume
+        musicPlayer?.volume = volume
     }
 }

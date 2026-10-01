@@ -16,9 +16,11 @@ val lightScheme = lightColorScheme(
     onSurface = Color(0xFF494038),
     onSurfaceVariant = Color(0xFF000000),
     surfaceContainerLow = Color(0xFFDED5C5),
+    surfaceContainerLowest = Color(0xFF71675A),
     surfaceDim = Color(0xFFFFFDF7),
     surfaceBright = Color(0xFFFFFFFF),
     surfaceVariant = Color(0xFFEADFC9),
+    surfaceContainerHigh = Color(0x80000000),
 )
 
 @Composable

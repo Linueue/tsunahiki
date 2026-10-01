@@ -5,77 +5,77 @@
 # --- Hiragana: Gojūon ---
 
 [[sets]]
-id = "hiragana_vowels"
+id = "Hiragana Vowels"
 script = "hiragana"
 unlock_value = 1
 members = ["あ", "い", "う", "え", "お"]
 romaji  = ["a",  "i",  "u",  "e",  "o"]
 
 [[sets]]
-id = "hiragana_k"
+id = "Hiragana K"
 script = "hiragana"
 unlock_value = 2
 members = ["か", "き", "く", "け", "こ"]
 romaji  = ["ka", "ki", "ku", "ke", "ko"]
 
 [[sets]]
-id = "hiragana_s"
+id = "Hiragana S"
 script = "hiragana"
 unlock_value = 3
 members = ["さ", "し", "す", "せ", "そ"]
 romaji  = ["sa", "shi", "su", "se", "so"]
 
 [[sets]]
-id = "hiragana_t"
+id = "Hiragana T"
 script = "hiragana"
 unlock_value = 4
 members = ["た", "ち", "つ", "て", "と"]
 romaji  = ["ta", "chi", "tsu", "te", "to"]
 
 [[sets]]
-id = "hiragana_n"
+id = "Hiragana N"
 script = "hiragana"
 unlock_value = 5
 members = ["な", "に", "ぬ", "ね", "の"]
 romaji  = ["na", "ni", "nu", "ne", "no"]
 
 [[sets]]
-id = "hiragana_h"
+id = "Hiragana H"
 script = "hiragana"
 unlock_value = 6
 members = ["は", "ひ", "ふ", "へ", "ほ"]
 romaji  = ["ha", "hi", "fu", "he", "ho"]
 
 [[sets]]
-id = "hiragana_m"
+id = "Hiragana M"
 script = "hiragana"
 unlock_value = 7
 members = ["ま", "み", "む", "め", "も"]
 romaji  = ["ma", "mi", "mu", "me", "mo"]
 
 [[sets]]
-id = "hiragana_y"
+id = "Hiragana Y"
 script = "hiragana"
 unlock_value = 8
 members = ["や", "ゆ", "よ"]
 romaji  = ["ya", "yu", "yo"]
 
 [[sets]]
-id = "hiragana_r"
+id = "Hiragana R"
 script = "hiragana"
 unlock_value = 9
 members = ["ら", "り", "る", "れ", "ろ"]
 romaji  = ["ra", "ri", "ru", "re", "ro"]
 
 [[sets]]
-id = "hiragana_w"
+id = "Hiragana W"
 script = "hiragana"
 unlock_value = 10
 members = ["わ", "を"]
 romaji  = ["wa", "wo"]
 
 [[sets]]
-id = "hiragana_n_standalone"
+id = "Hiragana N (Standalone)"
 script = "hiragana"
 unlock_value = 11
 members = ["ん"]
@@ -84,28 +84,28 @@ romaji  = ["n"]
 # --- Hiragana: Dakuten ---
 
 [[sets]]
-id = "hiragana_g"
+id = "Hiragana G"
 script = "hiragana"
 unlock_value = 12
 members = ["が", "ぎ", "ぐ", "げ", "ご"]
 romaji  = ["ga", "gi", "gu", "ge", "go"]
 
 [[sets]]
-id = "hiragana_z"
+id = "Hiragana Z"
 script = "hiragana"
 unlock_value = 13
 members = ["ざ", "じ", "ず", "ぜ", "ぞ"]
 romaji  = ["za", "ji", "zu", "ze", "zo"]
 
 [[sets]]
-id = "hiragana_d"
+id = "Hiragana D"
 script = "hiragana"
 unlock_value = 14
 members = ["だ", "ぢ", "づ", "で", "ど"]
 romaji  = ["da", "ji", "zu", "de", "do"]
 
 [[sets]]
-id = "hiragana_b"
+id = "Hiragana B"
 script = "hiragana"
 unlock_value = 15
 members = ["ば", "び", "ぶ", "べ", "ぼ"]
@@ -114,7 +114,7 @@ romaji  = ["ba", "bi", "bu", "be", "bo"]
 # --- Hiragana: Handakuten ---
 
 [[sets]]
-id = "hiragana_p"
+id = "Hiragana P"
 script = "hiragana"
 unlock_value = 16
 members = ["ぱ", "ぴ", "ぷ", "ぺ", "ぽ"]
@@ -123,77 +123,77 @@ romaji  = ["pa", "pi", "pu", "pe", "po"]
 # --- Katakana: Gojūon ---
 
 [[sets]]
-id = "katakana_vowels"
+id = "Katakana Vowels"
 script = "katakana"
 unlock_value = 17
 members = ["ア", "イ", "ウ", "エ", "オ"]
 romaji  = ["a",  "i",  "u",  "e",  "o"]
 
 [[sets]]
-id = "katakana_k"
+id = "Katakana K"
 script = "katakana"
 unlock_value = 18
 members = ["カ", "キ", "ク", "ケ", "コ"]
 romaji  = ["ka", "ki", "ku", "ke", "ko"]
 
 [[sets]]
-id = "katakana_s"
+id = "Katakana S"
 script = "katakana"
 unlock_value = 19
 members = ["サ", "シ", "ス", "セ", "ソ"]
 romaji  = ["sa", "shi", "su", "se", "so"]
 
 [[sets]]
-id = "katakana_t"
+id = "Katakana T"
 script = "katakana"
 unlock_value = 20
 members = ["タ", "チ", "ツ", "テ", "ト"]
 romaji  = ["ta", "chi", "tsu", "te", "to"]
 
 [[sets]]
-id = "katakana_n"
+id = "Katakana N"
 script = "katakana"
 unlock_value = 21
 members = ["ナ", "ニ", "ヌ", "ネ", "ノ"]
 romaji  = ["na", "ni", "nu", "ne", "no"]
 
 [[sets]]
-id = "katakana_h"
+id = "Katakana H"
 script = "katakana"
 unlock_value = 22
 members = ["ハ", "ヒ", "フ", "ヘ", "ホ"]
 romaji  = ["ha", "hi", "fu", "he", "ho"]
 
 [[sets]]
-id = "katakana_m"
+id = "Katakana M"
 script = "katakana"
 unlock_value = 23
 members = ["マ", "ミ", "ム", "メ", "モ"]
 romaji  = ["ma", "mi", "mu", "me", "mo"]
 
 [[sets]]
-id = "katakana_y"
+id = "Katakana Y"
 script = "katakana"
 unlock_value = 24
 members = ["ヤ", "ユ", "ヨ"]
 romaji  = ["ya", "yu", "yo"]
 
 [[sets]]
-id = "katakana_r"
+id = "Katakana R"
 script = "katakana"
 unlock_value = 25
 members = ["ラ", "リ", "ル", "レ", "ロ"]
 romaji  = ["ra", "ri", "ru", "re", "ro"]
 
 [[sets]]
-id = "katakana_w"
+id = "Katakana W"
 script = "katakana"
 unlock_value = 26
 members = ["ワ", "ヲ"]
 romaji  = ["wa", "wo"]
 
 [[sets]]
-id = "katakana_n_standalone"
+id = "Katakana N (Standalone)"
 script = "katakana"
 unlock_value = 27
 members = ["ン"]
@@ -202,28 +202,28 @@ romaji  = ["n"]
 # --- Katakana: Dakuten ---
 
 [[sets]]
-id = "katakana_g"
+id = "Katakana G"
 script = "katakana"
 unlock_value = 28
 members = ["ガ", "ギ", "グ", "ゲ", "ゴ"]
 romaji  = ["ga", "gi", "gu", "ge", "go"]
 
 [[sets]]
-id = "katakana_z"
+id = "Katakana Z"
 script = "katakana"
 unlock_value = 29
 members = ["ザ", "ジ", "ズ", "ゼ", "ゾ"]
 romaji  = ["za", "ji", "zu", "ze", "zo"]
 
 [[sets]]
-id = "katakana_d"
+id = "Katakana D"
 script = "katakana"
 unlock_value = 30
 members = ["ダ", "ヂ", "ヅ", "デ", "ド"]
 romaji  = ["da", "ji", "zu", "de", "do"]
 
 [[sets]]
-id = "katakana_b"
+id = "Katakana B"
 script = "katakana"
 unlock_value = 31
 members = ["バ", "ビ", "ブ", "ベ", "ボ"]
@@ -232,7 +232,7 @@ romaji  = ["ba", "bi", "bu", "be", "bo"]
 # --- Katakana: Handakuten ---
 
 [[sets]]
-id = "katakana_p"
+id = "Katakana P"
 script = "katakana"
 unlock_value = 32
 members = ["パ", "ピ", "プ", "ペ", "ポ"]

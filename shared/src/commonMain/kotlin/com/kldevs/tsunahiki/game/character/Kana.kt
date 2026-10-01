@@ -1,6 +1,7 @@
 package com.kldevs.tsunahiki.game.character
 
 import com.akuleshov7.ktoml.Toml
+import com.kldevs.tsunahiki.game.LanguageType
 import com.kldevs.tsunahiki.game.utils.CanvasStroke
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -28,7 +29,7 @@ class KanaDescription(val script: KanaScript, val rawChar: String, val romaji: S
 }
 
 @Serializable
-data class Progression(
+private data class Progression(
     val id: String,
     val script: String,
     val unlock_value: Int,
@@ -37,17 +38,27 @@ data class Progression(
 )
 
 @Serializable
-data class KanaToml(
+private data class KanaToml(
     val sets: List<Progression>,
 )
 
-class KanaCatalog private constructor(val progressions: List<Progression>, private val kanaToDescription: Map<String, KanaDescription>) : ICharacterCatalog {
+class KanaCatalog private constructor(private val progressions: List<ProgressionLevel>, private val kanaToDescription: Map<String, KanaDescription>) : ICharacterCatalog {
+
+    override fun getLanguage(): LanguageType = LanguageType.Kana
+
+    override fun getAudioPath(filename: String): String = "files/sfx/jp/${filename}.ogg"
 
     override fun fromText(text: String): KanaDescription {
         return kanaToDescription[text]!!
     }
 
+    override fun getProgressions(): List<ProgressionLevel> {
+        return progressions
+    }
+
     companion object {
+        private var cache: KanaCatalog? = null
+
         suspend fun load(): KanaCatalog {
             val bytes = Res.readBytes("files/progressions/kana.toml")
             val decoded = Toml.decodeFromString<KanaToml>(bytes.decodeToString())
@@ -61,8 +72,20 @@ class KanaCatalog private constructor(val progressions: List<Progression>, priva
                     }
                 }
             };
+            val progs = decoded.sets.map {
+                ProgressionLevel(
+                    unlockLevel = it.unlock_value,
+                    name = it.id,
+                    members = it.members,
+                    display = it.romaji,
+                )
+            }
 
-            return KanaCatalog(decoded.sets, descriptions)
+            cache = KanaCatalog(progs, descriptions)
+
+            return cache!!
         }
+
+        fun getOrNull(): KanaCatalog? = cache
     }
 }
