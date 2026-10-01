@@ -1,7 +1,7 @@
 # Tsunahiki 綱引き
 
 <p align="center">
-  <img src="docs/icon.svg" width="160" height="160" alt="Tsunahiki app icon" />
+  <img src="docs/appicon.svg" width="160" height="160" alt="Tsunahiki app icon" />
 </p>
 
 <p align="center">
