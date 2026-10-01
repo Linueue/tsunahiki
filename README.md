@@ -17,7 +17,7 @@
   <img alt="Compose Multiplatform" src="https://img.shields.io/badge/Compose%20Multiplatform-1.x-4285F4?logo=jetpackcompose&logoColor=white" />
   <img alt="Android" src="https://img.shields.io/badge/Android-API%2023%2B-3DDC84?logo=android&logoColor=white" />
   <img alt="iOS" src="https://img.shields.io/badge/iOS-13%2B-000000?logo=apple&logoColor=white" />
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue" />
+  <img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue" />
 </p>
 
 ---
